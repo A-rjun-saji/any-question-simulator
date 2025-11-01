@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CEH v13 Practice – Simulator</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap');
+
+    body {
+      margin: 0;
+      background-color: #000;
+      color: #00ffcc;
+      font-family: 'JetBrains Mono', monospace;
+      overflow-x: hidden;
+    }
+/* === Unified Header — Futuristic x Moonlit Village === */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background: radial-gradient(circle at top left, #050014 0%, #000 100%);
+  border-bottom: 1.5px solid rgba(0, 180, 255, 0.25);
+  box-shadow: 0 0 30px rgba(0, 150, 255, 0.1),
+              inset 0 0 20px rgba(0, 0, 0, 0.4);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(8px) brightness(0.9);
+  -webkit-backdrop-filter: blur(8px) brightness(0.9);
+}
+
+/* Left title (site name) */
+header .left {
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 1rem;
+  color: #00d9ff;
+  text-shadow: 0 0 6px #00eaff, 0 0 18px #ff00ff40;
+  transition: all 0.3s ease;
+}
+
+header .left:hover {
+  color: #ff00ff;
+  text-shadow: 0 0 12px #ff00ff, 0 0 25px #00eaff;
+}
+
+/* Right side (status or simulator mode) */
+header .right {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #bdefff;
+  opacity: 0.95;
+}
+
+header .right span {
+  color: #00ffff;
+  font-weight: bold;
+  text-shadow: 0 0 6px #00ffff, 0 0 12px #ff00ff66;
+  animation: blinkActive 2s ease-in-out infinite;
+}
+
+/* Neon flicker */
+@keyframes blinkActive {
+  0%, 100% {
+    opacity: 1;
+    text-shadow: 0 0 8px #00ffff, 0 0 16px #ff00ff66;
+  }
+  50% {
+    opacity: 0.7;
+    text-shadow: 0 0 4px #00ffff44, 0 0 8px #ff00ff22;
+  }
+}
+
+
+/* === Moonlit Holographic Main Title === */
+.page-title {
+  position: relative;
+  text-align: center;
+  margin-top: 60px;
+  font-size: 3.5rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 6px;
+  background: linear-gradient(90deg, #00d9ff, #0099ff, #b300ff, #00faff);
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #e0e0e0;
+  filter: drop-shadow(0 0 12px rgba(0, 255, 255, 0.25))
+          drop-shadow(0 0 24px rgba(255, 0, 255, 0.15));
+  animation: titleWave 6s ease-in-out infinite;
+  overflow: hidden;
+}
+
+/* Moving horizontal light scanner */
+.page-title::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 100%
+  );
+  transform: skewX(-25deg);
+  animation: lightSweep 7s linear infinite;
+}
+
+/* Soft digital scan lines + subtle flicker */
+.page-title::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.03) 0px,
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.25;
+  animation: flicker 4s ease-in-out infinite alternate;
+}
+
+/* Subtle subtitle glow under main title */
+.subtitle {
+  text-align: center;
+  font-size: 1rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 10px;
+  color: #aaf7ff;
+  opacity: 0.85;
+  font-family: "Share Tech Mono", monospace;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.4),
+               0 0 18px rgba(255, 0, 255, 0.15);
+  animation: subtitleFade 6s ease-in-out infinite alternate;
+}
+
+/* === Keyframes === */
+@keyframes lightSweep {
+  0% { left: -80%; }
+  100% { left: 120%; }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.35; }
+}
+
+@keyframes subtitleFade {
+  0% { opacity: 0.7; letter-spacing: 3px; }
+  100% { opacity: 1; letter-spacing: 5px; }
+}
+
+@keyframes titleWave {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+
+
+    /* === Quiz Container === */
+    .quiz-box {
+      max-width: 850px;
+      margin: 50px auto;
+      background: rgba(5, 25, 15, 0.9);
+      border: 2px solid #00ffcc;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 0 25px rgba(0, 255, 204, 0.25);
+      backdrop-filter: blur(4px);
+      transition: transform 0.3s ease;
+    }
+
+    .quiz-box:hover {
+      transform: scale(1.01);
+      box-shadow: 0 0 35px rgba(0, 255, 204, 0.4);
+    }
+
+    .question {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #aaffee;
+    }
+
+    .option {
+      background: #0b0b0b;
+      border: 1px solid #00ffaa80;
+      border-radius: 6px;
+      padding: 10px;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .option:hover {
+      background: #003322;
+      box-shadow: 0 0 10px #00ffaa44;
+    }
+
+    .correct {
+      background: #003311;
+      border-color: #00ffaa;
+      color: #00ffaa;
+    }
+
+    .wrong {
+      background: #330000;
+      border-color: #ff4b4b;
+      color: #ff4b4b;
+    }
+
+    .controls {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    button {
+      background: #00ffaa;
+      color: #000;
+      padding: 10px 25px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.2s;
+      box-shadow: 0 0 10px #00ffaa50;
+    }
+
+    button:hover {
+      background: #00ddaa;
+      box-shadow: 0 0 20px #00ffaa80;
+    }
+
+    .score-box {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 1.2rem;
+    }
+
+    .review {
+      margin-top: 20px;
+      border-top: 1px solid #00ff9f;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- === Futuristic Header === -->
+  <header>
+    <div class="left">⚡ Questions PRACTICE AREA </div>
+    <div class="right">Simulator Mode: <span>Active</span></div>
+  </header>
+
+  <!-- === Enhanced Title === -->
+  <h1 class="page-title">Any Questions  Practice – Simulator</h1>
+  <div class="subtitle">Simulate anything </div>
+
+  <!-- === Quiz Box === -->
+  <div class="quiz-box" id="quizBox">
+    <div id="questionContainer"></div>
+    <div class="controls">
+      <button id="prevBtn">Prev</button>
+      <button id="nextBtn">Next</button>
+      <button id="finishBtn">Finish</button>
+    </div>
+    <div class="score-box" id="scoreBox"></div>
+    <div class="review" id="reviewBox"></div>
+  </div>
+</body>
+</html>
+
+
+
+  <!-- Load questions and answers -->
+  <script src="questions.js"></script>
+  <script src="answers.js"></script>
+  <script src="music.js"></script>
+  <script src="background.js"></script>
+
+
+<script>
+  if (typeof QUESTIONS === "undefined") {
+    document.body.innerHTML =
+      "<p style='color:red;text-align:center;'>⚠️ questions.js not loaded or variable name mismatch.</p>";
+    throw new Error("QUESTIONS not loaded");
+  }
+  if (typeof ANSWERS === "undefined") {
+    document.body.innerHTML =
+      "<p style='color:red;text-align:center;'>⚠️ answers.js not loaded or variable name mismatch.</p>";
+    throw new Error("ANSWERS not loaded");
+  }
+
+  const questionContainer = document.getElementById("questionContainer");
+  const scoreBox = document.getElementById("scoreBox");
+  const reviewBox = document.getElementById("reviewBox");
+  let current = 0;
+  let score = 0;
+  const answers = ANSWERS;
+  const userAnswers = {}; // store user responses
+
+  // ✅ Toast setup
+  const toast = document.createElement("div");
+  toast.id = "toast";
+  toast.style.position = "fixed";
+  toast.style.top = "20px";
+  toast.style.left = "50%";
+  toast.style.transform = "translateX(-50%)";
+  toast.style.padding = "10px 25px";
+  toast.style.borderRadius = "10px";
+  toast.style.fontFamily = "'JetBrains Mono', monospace";
+  toast.style.fontWeight = "bold";
+  toast.style.fontSize = "15px";
+  toast.style.boxShadow = "0 0 15px rgba(0,255,159,0.6)";
+  toast.style.opacity = "0";
+  toast.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+  toast.style.zIndex = "9999";
+  document.body.appendChild(toast);
+
+  function showToast(msg, color = "#00ff9f", textColor = "#000") {
+    toast.textContent = msg;
+    toast.style.background = color;
+    toast.style.color = textColor;
+    toast.style.transform = "translateX(-50%) translateY(0)";
+    toast.style.opacity = "1";
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateX(-50%) translateY(-20px)";
+    }, 1500);
+  }
+
+  // ✅ Load question and restore previous selection
+  function loadQuestion() {
+    const q = QUESTIONS[current];
+    if (!q) return;
+
+    questionContainer.innerHTML = "";
+
+    const questionEl = document.createElement("div");
+    questionEl.className = "question";
+    questionEl.innerHTML = `<b>${current + 1}.</b> ${q.q}`;
+    questionContainer.appendChild(questionEl);
+
+    const correctIndex = answers[q.id];
+    const userChoice = userAnswers[q.id];
+
+    q.options.forEach((optText, i) => {
+      const opt = document.createElement("div");
+      opt.className = "option";
+
+      const codeEl = document.createElement("code");
+      codeEl.textContent = optText;
+      codeEl.style.whiteSpace = "pre-wrap";
+      codeEl.style.display = "block";
+      codeEl.style.color = "#00ff9f";
+      opt.appendChild(codeEl);
+
+      opt.onclick = () => selectOption(i);
+
+      // ✅ Restore previous selection styling
+      if (userChoice !== undefined) {
+        opt.style.pointerEvents = "none";
+        if (i === correctIndex) opt.classList.add("correct");
+        if (i === userChoice && i !== correctIndex) opt.classList.add("wrong");
+      }
+
+      questionContainer.appendChild(opt);
+    });
+  }
+
+  // ✅ Fixed score + no double count + color toasts
+  function selectOption(i) {
+    const q = QUESTIONS[current];
+    const correctIndex = answers[q.id];
+    const options = document.querySelectorAll(".option");
+
+    // prevent scoring if already answered
+    if (userAnswers[q.id] !== undefined) return;
+
+    userAnswers[q.id] = i;
+
+    options.forEach((opt, index) => {
+      opt.style.pointerEvents = "none";
+      if (index === correctIndex) opt.classList.add("correct");
+      if (index === i && i !== correctIndex) opt.classList.add("wrong");
+    });
+
+    if (i === correctIndex) {
+      score++;
+      showToast("✅ Correct Answer!", "#00ff9f", "#000");
+    } else {
+      showToast("❌ Wrong Answer", "#ff3b3b", "#fff");
+    }
+  }
+
+  document.getElementById("nextBtn").onclick = () => {
+    if (current < QUESTIONS.length - 1) {
+      current++;
+      loadQuestion();
+    }
+  };
+
+  document.getElementById("prevBtn").onclick = () => {
+    if (current > 0) {
+      current--;
+      loadQuestion();
+    }
+  };
+
+  // ✅ Hide correct answers for skipped questions
+  document.getElementById("finishBtn").onclick = () => {
+    questionContainer.innerHTML = "";
+    scoreBox.innerHTML = `Your Score: ${score} / ${QUESTIONS.length}`;
+
+    let reviewHTML =
+      "<h3>Review:</h3><ul style='list-style:none;padding-left:0;font-size:14px;'>";
+
+    QUESTIONS.forEach((q) => {
+      const userAns = userAnswers[q.id];
+      const correctAns = answers[q.id];
+      const correctText =
+        correctAns !== null && q.options[correctAns]
+          ? q.options[correctAns]
+          : null;
+
+      if (userAns === undefined) {
+        reviewHTML += `<li style="color:#aaa;">❓ Q${q.id}: Not Answered</li>`;
+      } else if (userAns === correctAns) {
+        reviewHTML += `<li style="color:#00ff9f;">✅ Q${q.id}: Correct — <span>${correctText}</span></li>`;
+      } else {
+        const userText = q.options[userAns] || "Unknown option";
+        const showCorrect =
+          correctText !== null
+            ? ` | Correct: "${correctText}"`
+            : " | Correct answer not defined";
+        reviewHTML += `<li style="color:#ff3b3b;">❌ Q${q.id}: Wrong — You chose: "${userText}"${showCorrect}</li>`;
+      }
+    });
+
+    reviewHTML += "</ul>";
+    reviewBox.innerHTML = reviewHTML;
+  };
+
+  loadQuestion();
+
+
+  
+
+
+
+</script>
+
+
+
+
+
+
+</body>
+</html>

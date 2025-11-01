@@ -1,0 +1,143 @@
+// === CEH V13 Simulator — Cyberpunk City Rain Background ===
+// Dark futuristic skyline with rain, neon haze & subtle lightning
+// Designed by ChatGPT ⚡
+
+const canvas = document.createElement("canvas");
+document.body.appendChild(canvas);
+const ctx = canvas.getContext("2d");
+
+canvas.style.position = "fixed";
+canvas.style.top = "0";
+canvas.style.left = "0";
+canvas.style.width = "100%";
+canvas.style.height = "100%";
+canvas.style.zIndex = "-1";
+canvas.style.background = "linear-gradient(to bottom, #02040a 0%, #000 100%)";
+
+let w, h;
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
+
+// === Create skyline silhouettes ===
+const buildings = [];
+for (let i = 0; i < 40; i++) {
+  buildings.push({
+    x: (w / 40) * i + Math.random() * 10 - 5,
+    width: w / 40,
+    height: h * (0.3 + Math.random() * 0.4),
+    glow: Math.random() > 0.8,
+    hue: Math.random() > 0.5 ? 190 : 310,
+  });
+}
+
+// === Raindrops ===
+class Raindrop {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * w;
+    this.y = Math.random() * -h;
+    this.len = Math.random() * 20 + 10;
+    this.speed = Math.random() * 10 + 5;
+    this.alpha = Math.random() * 0.4 + 0.3;
+    this.color = "rgba(0, 200, 255, " + this.alpha + ")";
+  }
+  draw() {
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    ctx.lineTo(this.x, this.y + this.len);
+    ctx.stroke();
+    this.y += this.speed;
+    if (this.y > h) this.reset();
+  }
+}
+
+const raindrops = Array.from({ length: 300 }, () => new Raindrop());
+
+// === Lightning flashes ===
+let lightning = 0;
+function drawLightning() {
+  if (Math.random() < 0.002) lightning = 1;
+  if (lightning > 0) {
+    ctx.fillStyle = `rgba(0, 180, 255, ${lightning * 0.1})`;
+    ctx.fillRect(0, 0, w, h);
+    lightning -= 0.05;
+  }
+}
+
+// === Neon reflection haze ===
+function drawHaze() {
+  const grad = ctx.createLinearGradient(0, h * 0.6, 0, h);
+  grad.addColorStop(0, "rgba(0, 255, 255, 0.05)");
+  grad.addColorStop(0.5, "rgba(255, 0, 255, 0.05)");
+  grad.addColorStop(1, "rgba(0, 0, 0, 0.8)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, h * 0.5, w, h * 0.5);
+}
+
+// === City Skyline ===
+function drawCity() {
+  buildings.forEach((b) => {
+    ctx.fillStyle = "#050505";
+    ctx.fillRect(b.x, h - b.height, b.width, b.height);
+
+    if (b.glow) {
+      const neon = ctx.createLinearGradient(0, h - b.height, 0, h);
+      neon.addColorStop(0, `hsla(${b.hue}, 100%, 60%, 0.2)`);
+      neon.addColorStop(1, "transparent");
+      ctx.fillStyle = neon;
+      ctx.fillRect(b.x, h - b.height, b.width, b.height);
+    }
+
+    // windows
+    if (Math.random() < 0.1) {
+      for (let i = 0; i < 6; i++) {
+        ctx.fillStyle = Math.random() > 0.5 ? "#00ffff33" : "#ff00ff33";
+        const wx = b.x + Math.random() * b.width;
+        const wy = h - Math.random() * b.height;
+        ctx.fillRect(wx, wy, 2, 2);
+      }
+    }
+  });
+}
+
+// === Ambient star particles ===
+const stars = Array.from({ length: 100 }, () => ({
+  x: Math.random() * w,
+  y: Math.random() * (h * 0.6),
+  s: Math.random() * 1.5,
+  o: Math.random() * 0.8,
+}));
+function drawStars() {
+  stars.forEach((s) => {
+    ctx.beginPath();
+    ctx.globalAlpha = s.o;
+    ctx.fillStyle = Math.random() > 0.5 ? "#00eaff" : "#ff4aff";
+    ctx.arc(s.x, s.y, s.s, 0, Math.PI * 2);
+    ctx.fill();
+    s.y += 0.05;
+    if (s.y > h * 0.6) s.y = 0;
+  });
+}
+
+// === Main Loop ===
+function animate() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+  ctx.fillRect(0, 0, w, h);
+
+  drawStars();
+  drawCity();
+  drawHaze();
+  raindrops.forEach((r) => r.draw());
+  drawLightning();
+
+  requestAnimationFrame(animate);
+}
+animate();
