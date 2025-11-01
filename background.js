@@ -8,7 +8,7 @@ document.querySelectorAll("canvas").forEach((c) => c.remove());
 // === Create and inject video element ===
 const video = document.createElement("video");
 video.id = "bg-video";
-video.src = "./video/test-1.mp4"; // <-- Replace with your actual video file
+video.src = "./test-1.mp4"; // <-- Replace with your actual video file
 video.autoplay = true;
 video.loop = true;
 video.muted = true;
@@ -42,3 +42,4 @@ Object.assign(overlay.style, {
   zIndex: "-1",
 });
 document.body.appendChild(overlay);
+
